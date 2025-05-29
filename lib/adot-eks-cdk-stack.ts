@@ -104,6 +104,7 @@ export class AdotEksDaemonsetStack extends cdk.Stack {
       },
       data: {
         'collector.yaml': collectorConfig,
+        skipValidation: true,
       },
     });
     configMap.node.addDependency(namespace);
