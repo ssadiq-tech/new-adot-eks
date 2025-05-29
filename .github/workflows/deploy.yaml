@@ -68,7 +68,7 @@ jobs:
       run: npx cdk synth
 
     - name: CDK Deploy
-      run: npx cdk deploy --require-approval never
+      run: npx cdk deploy --require-approval never --verbose
       env:
         OIDC_PROVIDER_ARN: arn:aws:iam::131332286832:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/DCEC6B0056C380571D6F9FB7CC4D2456
         KUBECTL_ROLE_ARN: arn:aws:iam::131332286832:role/eksctl-adot-eks-clusters-cluster-ServiceRole-nFa4Yqt1SVVq
