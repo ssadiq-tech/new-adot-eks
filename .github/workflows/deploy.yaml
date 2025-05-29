@@ -8,14 +8,14 @@ on:
 env:
   AWS_REGION: us-east-1
   CLUSTER_NAME: adot-eks-clusters
-  NAMESPACE: aws-otel-eks
+  NAMESPACE: adot-namespace  # updated to match your CDK config
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write   # Required for GitHub OIDC to AWS
+      id-token: write   # For GitHub OIDC to AWS
       contents: read    # Needed to read repo contents
 
     steps:
@@ -50,18 +50,6 @@ jobs:
           npm install
         fi
 
-    - name: Install Kubernetes tools
-      run: |
-        # Install kubectl
-        curl -LO "https://dl.k8s.io/release/$(curl -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-        chmod +x kubectl
-        sudo mv kubectl /usr/local/bin/
-        
-        # Install aws-iam-authenticator
-        curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.21.2/2021-07-05/bin/linux/amd64/aws-iam-authenticator
-        chmod +x aws-iam-authenticator
-        sudo mv aws-iam-authenticator /usr/local/bin/
-
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v3
       with:
@@ -74,7 +62,7 @@ jobs:
 
     - name: Update kubeconfig for EKS
       run: |
-        aws eks update-kubeconfig --region us-east-1 --name adot-eks-clusters
+        aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
     - name: CDK Synth
       run: npx cdk synth
@@ -84,11 +72,14 @@ jobs:
       env:
         OIDC_PROVIDER_ARN: arn:aws:iam::131332286832:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/DCEC6B0056C380571D6F9FB7CC4D2456
         KUBECTL_ROLE_ARN: arn:aws:iam::131332286832:role/eksctl-adot-eks-clusters-cluster-ServiceRole-nFa4Yqt1SVVq
-    - name: Apply Kubernetes manifests
+
+    # Optional: Only needed if you have extra raw manifest files
+    - name: Apply Kubernetes manifests (optional)
+      if: ${{ always() }}
       run: |
         kubectl cluster-info
         if [ -d "manifests/" ]; then
-          kubectl apply -f manifests/ -n 
+          kubectl apply -f manifests/ -n $NAMESPACE
         else
           echo "No manifests directory found."
         fi
