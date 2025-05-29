@@ -1,0 +1,4 @@
+#!/bin/bash
+mkdir -p /opt/kubectl
+cp /var/task/kubectl/kubectl /opt/kubectl/
+chmod +x /opt/kubectl/kubectl
