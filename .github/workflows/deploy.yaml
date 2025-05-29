@@ -72,14 +72,3 @@ jobs:
       env:
         OIDC_PROVIDER_ARN: arn:aws:iam::131332286832:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/DCEC6B0056C380571D6F9FB7CC4D2456
         KUBECTL_ROLE_ARN: arn:aws:iam::131332286832:role/eksctl-adot-eks-clusters-cluster-ServiceRole-nFa4Yqt1SVVq
-
-    # Optional: Only needed if you have extra raw manifest files
-    - name: Apply Kubernetes manifests (optional)
-      if: ${{ always() }}
-      run: |
-        kubectl cluster-info
-        if [ -d "manifests/" ]; then
-          kubectl apply -f manifests/ -n $NAMESPACE
-        else
-          echo "No manifests directory found."
-        fi
